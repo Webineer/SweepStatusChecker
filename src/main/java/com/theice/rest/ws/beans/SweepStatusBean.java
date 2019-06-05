@@ -1,36 +1,46 @@
 package com.theice.rest.ws.beans;
 
 import java.util.ArrayList;
-import javax.enterprise.context.RequestScoped;
+import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.event.ValueChangeEvent;
+import javax.validation.constraints.NotNull;
 
 import com.theice.rest.ws.dto.SweepStatus;
 import com.theice.rest.ws.dto.SweepStatusData;
 import com.theice.rest.ws.services.SweepStatusService;
 
 @SuppressWarnings("deprecation")
-@ManagedBean(name = "compareBean", eager=true)
-@RequestScoped
+@ManagedBean(name = "compareBean")
+@SessionScoped
 public class SweepStatusBean {
 	private static final long serialVersionUID = 1L;
+	private Logger log;
 
 	public SweepStatusService service = new SweepStatusService();
 	public SweepStatusData data = new SweepStatusData();
-	private ArrayList<SweepStatus> sweepStatus;
+	private ArrayList<SweepStatus> sweepStatusArrayList;
 	//private ArrayList<SweepStatus> sweepStatusServer = this.getSweepStatusByServerAndRegion();
+	@NotNull (message = "Please select an enviroment")
 	private String environment;
+	private String[] environments;
+	@NotNull (message = "Please select an area")
 	private String area;
+	private String[] areas;
 	private String status;
 	private String viewStatus;
 	private String errorMessage;
 
-	public ArrayList<SweepStatus> getSweepStatus() {
-		return sweepStatus;
+	public ArrayList<SweepStatus> getSweepStatusArrayList() {
+		return sweepStatusArrayList;
 		//return this.getAllSweepStatus();
 	}
 
-	public void setSweepStatus(ArrayList<SweepStatus> sweepStatus) {
-		this.sweepStatus = sweepStatus;
+	public void setSweepStatusArrayList(ArrayList<SweepStatus> sweepStatusArrayList) {
+		this.sweepStatusArrayList = sweepStatusArrayList;
 	}
 
 	public String getEnvironment() {
@@ -73,35 +83,56 @@ public class SweepStatusBean {
 		this.errorMessage = errorMessage;
 	}
 
+	public String[] getEnvironments() {
+		return environments;
+	}
+
+	public String[] getAreas() {
+		return areas;
+	}
+
+	public void setAreas(String[] areas) {
+		this.areas = areas;
+	}
+
+	public void setEnvironments(String[] environments) {
+		this.environments = environments;
+	}
+	
+	@PostConstruct
+	public void init() {
+		this.setEnvironments(this.getEnvironmentsList());
+	}
+
 	public ArrayList<SweepStatus> getAllSweepStatus() {
 		
-		ArrayList<SweepStatus> sweepStatusList = new ArrayList<SweepStatus>();
+		ArrayList<SweepStatus> ssList = new ArrayList<SweepStatus>();
 		String[] directoryList = data.getDirectoryList();
 		//String[] subDirectoryList = data.getSubDirectoryList();
 		
-		sweepStatusList = service.readTextFiles(directoryList, "all");
+		ssList = service.readTextFiles(directoryList, "all");
 		
-		return sweepStatusList;
+		return ssList;
 	}
 	
 	public ArrayList<SweepStatus> getGoodSweepStatus() {
 		
-		ArrayList<SweepStatus> sweepStatusList = new ArrayList<SweepStatus>();
+		ArrayList<SweepStatus> ssList = new ArrayList<SweepStatus>();
 		String[] directoryList = data.getDirectoryList();
 		
-		sweepStatusList = service.readTextFiles(directoryList,"good");
+		ssList = service.readTextFiles(directoryList,"good");
 		
-		return sweepStatusList;
+		return ssList;
 	}
 	
 	public ArrayList<SweepStatus> getBadSweepStatus() {
 		
-		ArrayList<SweepStatus> sweepStatusList = new ArrayList<SweepStatus>();
+		ArrayList<SweepStatus> ssList = new ArrayList<SweepStatus>();
 		String[] directoryList = data.getDirectoryList();
 		
-		sweepStatusList = service.readTextFiles(directoryList, "bad");
+		ssList = service.readTextFiles(directoryList, "bad");
 		
-		return sweepStatusList;
+		return ssList;
 	}
 	
 	public String theTest() {
@@ -111,7 +142,7 @@ public class SweepStatusBean {
 	public String getSweepStatusByServerAndRegion() {	
 		System.out.println("Entering SweepStatusBean.getSweepStatusByServerAndRegion");
 		
-		ArrayList<SweepStatus> sweepStatusList = new ArrayList<SweepStatus>();
+		ArrayList<SweepStatus> ssList = new ArrayList<SweepStatus>();
 /*		SweepStatus ss = new SweepStatus("sweepName", "http://www.cnn.com", "capgui1-devvm", "region", true);
 		sweepStatusList.add(ss);
 		
@@ -130,7 +161,7 @@ public class SweepStatusBean {
 		
 		//determine which directories have been selected
 		String searchString = pathPrefix + this.getEnvironment();
-		System.out.println("path prefix is " + searchString);
+		System.out.println("search string is " + searchString);
 		for(String dir : directoryList) {
 			if (dir.contains(this.getEnvironment())) {
 				System.out.println("dir is " + dir);
@@ -159,23 +190,57 @@ public class SweepStatusBean {
 			//convert arraylist to array
 			String[] tempArray2 = new String[altResultDirList.size()];
 			tempArray2 = altResultDirList.toArray(tempArray2);
-			sweepStatusList = service.readTextFiles(tempArray2, this.getStatus());
+			ssList = service.readTextFiles(tempArray2, this.getStatus());
 		} else {
-			sweepStatusList = service.readTextFiles(tempArray, this.getStatus());
+			ssList = service.readTextFiles(tempArray, this.getStatus());
+		}
+		System.out.println("the sweep status list size is " + Integer.toString(ssList.size()));
+		if (ssList.size() > 0) {
+			System.out.println("the first sweep status is " + ssList.get(0).getSweepName());
 		}
 		
-		this.setSweepStatus(sweepStatusList);
+		this.setSweepStatusArrayList(ssList);
 			
 		return "index.xhtml";
 	}
-
-/*	public ArrayList<SweepStatus> getSweepStatusServer() {
-		return sweepStatusServer;
+	
+	public String[] getEnvironmentsList() {
+		System.out.println("Entering SweepStatusBean.getEnvironmentsList");
+		
+		String[] result;
+		SweepStatusData data = new SweepStatusData();
+		result = data.getCompareList();
+		return result;
 	}
+	
+	public void getAreasList(ValueChangeEvent e) {
+		System.out.println("Entering SweepStatusBean.getAreasList");
+		
+		String[] result = data.getDirectoryList();
+		SweepStatusData data = new SweepStatusData();
+		
+		//assign new value to localeCode
+		String newValue = e.getNewValue().toString();
+		
+		System.out.println("the environment selection is " + newValue);
+		this.setEnvironment(newValue);
+		
+		if(getEnvironment().equals("ALLPR_C4Z01_M2ZA1")) {
+			result = data.getDirectoryListALLPR_C4Z01_M2ZA1();
+		} else if(getEnvironment().equals("DV_PR")) {
+			result = data.getDirectoryListDV_PR();
+		} else if(getEnvironment().equals("EOD")) {
+			result = data.getDirectoryListEOD();
+		} else if(getEnvironment().equals("PT_PR")) {
+			result = data.getDirectoryListPT_PR();
+		} else if(getEnvironment().equals("QA_PR")) {
+			result = data.getDirectoryListALLPR_C4Z01_M2ZA1();
+		} else {
+			result = null;
+		}
 
-	public void setSweepStatusServer(ArrayList<SweepStatus> sweepStatusServer) {
-		this.sweepStatusServer = sweepStatusServer;
-	}*/
-
+		
+		this.setAreas(result);
+	}
 
 }

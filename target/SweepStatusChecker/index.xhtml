@@ -1,49 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:c="http://java.sun.com/jsp/jstl/core" > 
   <h:head>
     	<h:outputStylesheet name="css/table-style.css"  />
   </h:head>
   <h:body>
+  <h:message id="m3" for="envValue" style="color:red"/> <p></p>
   <div align="center">  	
     	<h1>Sweep Compares Report</h1>
     	
     	<h:form id="sweepStatusForm">
 		<h:panelGrid columns="4">
 			<h:panelGroup>
-			<h:outputLabel value="Environment" />
-				<h:selectOneMenu value="#{compareBean.environment}">
-					<f:selectItem itemValue="prod_pta" itemLabel="Legacy Prod vs Cermack PTA" />
-					<f:selectItem itemValue="prod_ptb" itemLabel="Legacy Prod vs Cermack PTB" />
-					<f:selectItem itemValue="prod_c4z-pr-capnp-01" itemLabel="Legacy Prod vs Cermack Prod 01" />
-					<f:selectItem itemValue="prod_m2z-pr-capnp-a1" itemLabel="Legacy Prod vs Mahwah Prod A1" />
-					<f:selectItem itemValue="prod_m2z-pr-capnp-b1" itemLabel="Legacy Prod v Mahwah Prod B1" />
+				<h:outputLabel for="envValue" value="Environment: " title="Environment" />
+				<h:selectOneMenu id="envValue" value="#{compareBean.environment}" title="Environment" valueChangeListener="#{compareBean.getAreasList}" onchange="submit()" >
+					<f:selectItems value="#{compareBean.environments}" />
 				</h:selectOneMenu>
 			</h:panelGroup>
 			<h:panelGroup>
-			<h:outputLabel value="Area" />
-				<h:selectOneMenu value="#{compareBean.area}">
-					<f:selectItem itemValue="all" itemLabel="All" />
-					<f:selectItem itemValue="Asia" itemLabel="Asia" />
-					<f:selectItem itemValue="Canada" itemLabel="Canada" />
-					<f:selectItem itemValue="Dataline" itemLabel="Dataline" />
-					<f:selectItem itemValue="Europe" itemLabel="Europe" />
-					<f:selectItem itemValue="Middle_East" itemLabel="Middle East" />
-					<f:selectItem itemValue="Nasdaq_BB_And_OOTC_And_Mutual_Funds" itemLabel="NASDAQ BB and OOTC and Mutual Funds" />
-					<f:selectItem itemValue="Native_NASDAQ" itemLabel="Native NASDAQ" />
-					<f:selectItem itemValue="Native_NYAM" itemLabel="Native NYAM" />
-					<f:selectItem itemValue="Oceania" itemLabel="Oceania" />
-					<f:selectItem itemValue="Sigma" itemLabel="Sigma" />
-					<f:selectItem itemValue="South_America" itemLabel="South America" />
-					<f:selectItem itemValue="US_Indexes" itemLabel="US Indexes" />
-					<f:selectItem itemValue="US_Mutual_Funds" itemLabel="US Mutual Funds" />
-					<f:selectItem itemValue="US_NYSE_Bonds" itemLabel="US NYSE Bonds" />
+				<h:outputLabel for="areaValue" value="Area: " title="Area" />
+				<h:selectOneMenu id="areaValue" value="#{compareBean.area}" title="Area" >
+					<f:selectItems value="#{compareBean.areas}" />
 				</h:selectOneMenu>
 				</h:panelGroup>
 				<h:panelGroup>
-			<h:outputLabel value="Status" />
-				<h:selectOneMenu value="#{compareBean.status}">
+			<h:outputLabel for="status" value="Status: " title="Status" />
+				<h:selectOneMenu id="status" value="#{compareBean.status}" title="Status" >
 					<f:selectItem itemValue="all" itemLabel="All" />
 					<f:selectItem itemValue="pass" itemLabel="Pass" />
 					<f:selectItem itemValue="fail" itemLabel="Fails" />
@@ -58,15 +40,15 @@
     	<p>Area: <h:outputText value = "#{compareBean.area}"></h:outputText></p>
     	<p>Status: <h:outputText value = "#{compareBean.status}"></h:outputText></p -->
     	
- <c:if test="#{compareBean.sweepStatus != null}" >
     <h2>Compare Summary</h2>
     	
     	<h:outputText value = "#{compareBean.errorMessage}" rendered = "#compareBean.errorMessage != null" style="color:red;" />
+    	<h:outputText value = "No Data Available" rendered = "#{compareBean.sweepStatusArrayList == null}" style="color:black;" />
     	
-    		<h:dataTable value="#{compareBean.sweepStatus}" var="ss"
+    		<h:dataTable value="#{compareBean.sweepStatusArrayList}" var="ss"
     			styleClass="order-table"
     			headerClass="order-table-header"
-    			rowClasses="order-table-odd-row,order-table-even-row">
+    			rowClasses="order-table-odd-row,order-table-even-row" rendered="#{compareBean.sweepStatusArrayList != null}">
 
     			<h:column>
     				<!-- column header -->
@@ -89,14 +71,13 @@
     				<h:outputText value="#{ss.region}"></h:outputText>
     			</h:column>
     			
-    			<h:column>
+    			<h:column style="width: 25px;">
     				<f:facet name="header">Status</f:facet>
     				<!--  h:outputText value="MMMMMMMMMM" style="#{ss.errorStatus ? 'color:green; background-color:green' : 'color:red; background-color: red'}"></h:outputText -->
     				<h:outputText value="MMMMMMMMMM" styleClass="#{ss.errorStatus ? 'pass' : 'fail'}"></h:outputText>
     			</h:column>
     		
     		</h:dataTable>
-  </c:if>
   </div>  		
   	
     </h:body>

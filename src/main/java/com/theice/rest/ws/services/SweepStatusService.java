@@ -27,7 +27,7 @@ public class SweepStatusService implements Serializable {
 		System.out.println("Entering SweepStatusService.readTextFile");
 		
 		SweepStatusData data = new SweepStatusData();
-		String link = "http://capgui1-devvm:8080" + data.getUrlPath();
+		String link = "http://c1z-dv-capqa-d01.intcx.net:8080" + data.getUrlPath();
 		
 		System.out.println("the name is " + file.getName());
 		String fileName = this.stripExtension(file.getName());

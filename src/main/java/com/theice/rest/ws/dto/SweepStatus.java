@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class SweepStatus implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private String sweepName;
 	private String linkUrl;
 	private String region;

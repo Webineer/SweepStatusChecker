@@ -9,7 +9,7 @@ import com.theice.rest.ws.dto.SweepStatus;
 import com.theice.rest.ws.dto.SweepStatusData;
 import com.theice.rest.ws.services.SweepStatusService;
 
-@ManagedBean(name = "sweepViewBean", eager = true)
+@ManagedBean(name = "viewBean")
 @RequestScoped
 public class SweepViewBean {
 	
